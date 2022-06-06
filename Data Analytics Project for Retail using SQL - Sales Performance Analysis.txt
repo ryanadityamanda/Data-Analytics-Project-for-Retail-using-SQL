@@ -1,0 +1,44 @@
+#Overall Performances by Year
+SELECT year(order_date) years, SUM(sales) sales, COUNT(order_quantity) number_of_order FROM dqlab_sales_store WHERE year(order_date) BETWEEN 2009 AND 2012 AND order_status = 'Order Finished' GROUP by year(order_date);
+
+#Overall Performances by Product Sub-Category
+SELECT year(order_date) years, product_sub_category, 
+SUM(sales) sales 
+from dqlab_sales_store 
+WHERE year(order_date) 
+BETWEEN 2011 AND 2012 
+AND order_status = 'Order Finished' 
+GROUP by 1,2
+ORDER by year(order_date), sales DESC;
+
+#Promotion Effectiveness and Efficiency by Years
+SELECT year(order_date) years, SUM(sales) sales, SUM(discount_value) promotion_value, ROUND(SUM(discount_value)*100/SUM(sales),2) burn_rate_percentage
+FROM dqlab_sales_store
+WHERE order_status = 'Order Finished'
+GROUP BY 1;
+
+#Promotion Effectiveness and Efficiency by Product Sub Category
+SELECT year(order_date) years, product_sub_category, product_category, 
+	SUM(sales) sales,
+	SUM(discount_value) promotion_value,
+	ROUND(SUM(discount_value)*100/SUM(sales),2) burn_rate_percentage
+FROM dqlab_sales_store
+WHERE order_status = 'Order Finished' and year(order_date) = 2012
+GROUP BY 1,2,3
+ORDER BY sales desc
+
+#Customers Transactions per Year
+SELECT LEFT(order_date, 4) years,	
+COUNT(distinct customer) number_of_customer	
+FROM dqlab_sales_store	
+WHERE order_status = 'Order Finished'	
+GROUP by 1	
+ORDER by 1	
+
+#Number of New Customer Every Year
+SELECT year(first_transaction) years, COUNT(customer) new_cutomer
+FROM(SELECT DISTINCT(customer) customer, MIN(order_date) first_transaction
+FROM dqlab_sales_store
+WHERE order_status = 'Order Finished'
+GROUP BY customer first_transaction
+GROUP by year(first_transaction)
